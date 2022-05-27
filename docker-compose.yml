@@ -30,6 +30,7 @@ services:
     volumes:
       - ./prometheus:/etc/prometheus
       - prometheus_data:/prometheus
+    command: --web.enable-lifecycle --config.file=/etc/prometheus/prometheus.yml
     ports:
       - 9090:9090
     expose:
@@ -46,8 +47,6 @@ services:
       - 3000:3000
     expose:
       - 3000
-#    links:
-#      - prometheus
     networks:
       - nova-rede
 
