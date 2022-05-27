@@ -1,14 +1,19 @@
 version: '3.8'
 services:
-  app:
-    image: coders/springboot-prometheus-grafana
+  application-usuario:
+    container_name: application-usuario
+    build:
+      context: docker-application-usuario
+      dockerfile: Dockerfile
+    image: application-usuario:latest
     networks:
       - nova-rede
-    container_name: application
     ports:
       - 8080:8080
     depends_on:
       - mongodb
+    expose:
+      - 8080
 
   mongodb:
     image: mongo
@@ -16,40 +21,41 @@ services:
       - mongodata:/data/db
     ports:
       - "27017:27017"
-    restart: always
+    restart: unless-stopped
     networks:
       - nova-rede
 
   prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus
-    restart: unless-stopped
     volumes:
-      - ./docker/prometheus/config:/etc/prometheus
-      - ./docker/prometheus/data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
+      - ./prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
     ports:
       - 9090:9090
+    expose:
+      - 9090
     networks:
       - nova-rede
 
   grafana:
-    image: grafana/grafana
-    container_name: grafana
-    hostname: grafana
-    restart: unless-stopped
+    image: grafana/grafana:latest
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
     ports:
       - 3000:3000
+    expose:
+      - 3000
+#    links:
+#      - prometheus
     networks:
       - nova-rede
 
 volumes:
   mongodata:
-  prometheusdata:
-  grafanadata:
+  prometheus_data: {}
+  grafana_data: {}
 
 networks:
   nova-rede:
-    external: true
+    driver: bridge
