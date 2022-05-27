@@ -2,9 +2,6 @@ version: '3.8'
 services:
   application-usuario:
     container_name: application-usuario
-    build:
-      context: docker-application-usuario
-      dockerfile: Dockerfile
     image: application-usuario:latest
     networks:
       - nova-rede
@@ -28,9 +25,7 @@ services:
   prometheus:
     image: prom/prometheus:latest
     volumes:
-      - ./prometheus:/etc/prometheus
-      - prometheus_data:/prometheus
-    command: --web.enable-lifecycle --config.file=/etc/prometheus/prometheus.yml
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - 9090:9090
     expose:
